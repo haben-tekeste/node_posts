@@ -61,7 +61,7 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://mekson:Dl2WqEpC0kzV1g9z@cluster0.di5uskw.mongodb.net/post_rest?retryWrites=true&w=majority"
+    process.env.MONGO_DB_URI
   )
   .then(() => {
     app.listen(8080, () => {
