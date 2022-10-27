@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: trusted,
+    required: true,
   },
   password: {
     type: String,
@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: trusted,
+    default: "I am new",
   },
   posts: [
     {

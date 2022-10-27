@@ -9,6 +9,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const feedRoutes = require("./routes/feed");
+const authRoutes = require('./routes/authRoute')
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -55,6 +56,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(authRoutes)
 app.use("/feed", feedRoutes);
 
 app.use((error, req, res, next) => {
