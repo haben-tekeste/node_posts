@@ -7,14 +7,14 @@ router.post(
   "/signup",
   [
     body("email").isEmail().normalizeEmail(),
-    body("password").not().isEmpty().isLength({ min: 5 }),
+    body("password").isLength({ min: 5 }),
   ],
   authController.userSignup
 );
 
-router.post('/login',[
+router.post("/login", [
   body("email").isEmail().normalizeEmail(),
   body("password").not().isEmpty().isLength({ min: 5 }),
-])
+]);
 
 module.exports = router;

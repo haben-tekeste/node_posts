@@ -11,7 +11,6 @@ exports.userSignup = (req, res, next) => {
     throw error;
   }
   const { email, password, name } = req.body;
-  let hashedPassword;
   User.findOne({ email })
     .then((user) => {
       if (user) {
@@ -19,27 +18,14 @@ exports.userSignup = (req, res, next) => {
         error.statusCode = 422;
         throw error;
       }
-      bcrypt.genSalt(10, (err, salt) => {
-        if (err) {
-          const error = new Error("Something went wrong");
-          throw error;
-        }
-        bcrypt.hash(user.password, salt, (err, hash) => {
-          if (err) {
-            const error = new Error("Something went wrong");
-            throw error;
-          }
-          hashedPassword = hash;
-        });
-      });
+
       const newUser = new User({
         name,
         email,
-        password: hashedPassword,
+        password,
       });
-      return newUser.save();
-    })
-    .then((result) => {
+      return newUser.save()
+    }).then(() => {
       res.status(200).json({
         message: "Users signed up successfuly",
       });
