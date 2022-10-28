@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Post = require("../models/Post");
+const User = require('../models/User')
 const util = require("../util/util");
 
 //
@@ -54,18 +55,24 @@ exports.createPost = (req, res, next) => {
   const post = new Post({
     title,
     content,
-    creator: {
-      name: "Haben",
-    },
+    creator: req.userId,
     imageUrl,
   });
   post
     .save()
     .then((result) => {
-      console.log(result);
+      return User.findById(req.userId)
+      
+    }).then(user => {
+      if (!user){
+        const error = new Error('No user found');
+        error.statusCode = 422;
+        throw error;
+      }
+      user.posts.push(post);
       res.status(201).json({
         message: "Post created successfully!",
-        post: result,
+        post
       });
     })
     .catch((err) => {
@@ -113,6 +120,11 @@ exports.updatePost = (req, res, next) => {
   }
   Post.findById(postId)
     .then((post) => {
+      if (post.creator.toString() !== req.userId){
+        const error = new Error("Not authorized to perform this operation");
+        error.statusCode = 403;
+        throw error;
+      }
       if (!post) {
         const error = new Error("Post not found");
         error.statusCode = 404;
@@ -147,6 +159,11 @@ exports.deletePost = (req, res, next) => {
       if (!post) {
         const error = new Error("Post not found");
         error.statusCode = 404;
+        throw error;
+      }
+      if (post.creator.toString() !== req.userId){
+        const error = new Error("Not authorized to perform this operation");
+        error.statusCode = 403;
         throw error;
       }
       util.deleteImage(post.imageUrl);
