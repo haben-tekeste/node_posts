@@ -64,7 +64,7 @@ class Feed extends Component {
       .then((resData) => {
         this.setState({
           posts: resData.posts.map(post => {
-            return {...post,imagePath:post.imageUrl}
+            return {...post,imagePath:post.imageUrl,author:post.creator.name}
           }),
           totalPosts: resData.totalItems,
           postsLoading: false,
