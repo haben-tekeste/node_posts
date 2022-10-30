@@ -15,6 +15,6 @@ router.post(
 router.post("/login", [
   body("email").isEmail().normalizeEmail(),
   body("password").not().isEmpty().isLength({ min: 5 }),
-]);
+],authController.userLogin);
 
 module.exports = router;
