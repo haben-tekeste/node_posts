@@ -4,12 +4,11 @@ const mongoose = require("mongoose");
 const path = require("path");
 const multer = require("multer");
 const cors = require("cors");
-
 //
 require("dotenv").config();
 
 const feedRoutes = require("./routes/feed");
-const authRoutes = require('./routes/authRoute')
+const authRoutes = require("./routes/authRoute");
 
 const app = express();
 const fileStorage = multer.diskStorage({
@@ -56,7 +55,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(authRoutes)
+app.use(authRoutes);
 app.use("/feed", feedRoutes);
 
 app.use((error, req, res, next) => {
@@ -69,8 +68,10 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(process.env.MONGO_DB_URI.toString())
   .then(() => {
-    app.listen(8080, () => {
-      console.log("connected");
+    const server = app.listen(8080);
+    const io = require("./socket").init(server);
+    io.on("connection", (socket) => {
+      console.log("user connected");
     });
   })
   .catch((err) => {

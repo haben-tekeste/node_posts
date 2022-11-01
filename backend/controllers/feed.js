@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const Post = require("../models/Post");
 const User = require("../models/User");
 const util = require("../util/util");
+const io = require("../socket");
 
 //
 const ITEMS_PER_PAGE = 2;
@@ -14,11 +15,12 @@ exports.getPosts = (req, res, next) => {
       totalItems = nbr;
       return Post.find()
         .populate("creator")
+        .sort({createdAt:-1})
         .skip((currentPage - 1) * ITEMS_PER_PAGE)
         .limit(ITEMS_PER_PAGE);
     })
     .then((posts) => {
-      console.log(posts);
+      // console.log(posts);
       if (!posts) {
         const error = new Error("No post available");
         error.statusCode = 404;
@@ -77,6 +79,7 @@ exports.createPost = (req, res, next) => {
       return user.save();
     })
     .then((result) => {
+      io.getIO().emit("posts", { action: "create", post:{...post._doc,creator:{_id:req.userId,name:creator.name}} });
       res.status(201).json({
         message: "Post created successfully!",
         post,
@@ -150,6 +153,7 @@ exports.updatePost = (req, res, next) => {
       return post.save();
     })
     .then((result) => {
+      io.getIO().emit('posts',{action:'update',post:result})
       res.status(200).json({
         message: "Post updated successfuly",
         post: result,
